@@ -47,7 +47,7 @@ public class LinkedList<T> {
 		size = 0;
 		head = null;
 	}
-	
+
 
 	public void add(T item) throws Exception {
 		if (head == null) {
