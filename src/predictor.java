@@ -11,9 +11,10 @@ public class predictor {
             "WY"};
     ArrayList<String[]> a = new ArrayList<>();//ArrayList
     LinkedList<String[]> l = new LinkedList<>();//LinkedList
-    ArrayList<String[]> repeatArray = new ArrayList<>();
-    LinkedList<String[]> repeatLinkedList = new LinkedList<>();
-    int numberOfMaxiumValues = 0;
+    ArrayList<String[]> repeatArray = new ArrayList<>();//use when multiple maximum value occurs, store repeated value
+    LinkedList<String[]> repeatLinkedList = new LinkedList<>();////use when multiple maximum value occurs,store repeated value
+    int numberOfMaxiumValues = 0;//record number of repeat
+
     //helpers
     //return ListType value in property file
     private String ListType() throws IOException {
@@ -42,7 +43,7 @@ public class predictor {
     //check gender is valid
     private boolean validGender(String Gender){return (Gender.equals("F")||Gender.equals("M")); }
     //check if combination is contained in ssa files
-    public boolean validCombination(){
+    private boolean validCombination(){
         if (a.size ==0&&l.size()==0)
             return false;
         return true;
@@ -60,7 +61,6 @@ public class predictor {
     //if gender and name matches with input value, put it into ArrayList
     private void writeToArray(String State,String Gender,String Name) throws Exception {
         File myObj = new File(Directory()+State+".TXT");
-        System.out.println(Directory()+State+".TXT");
         Scanner myReader = new Scanner(myObj);
         while (myReader.hasNextLine()) {
             String data = myReader.nextLine();
@@ -94,10 +94,10 @@ public class predictor {
                     maxIndex = i;
                 }
             }
+            //this loop is used to find repeat maximum values and put in repeat array
             for (int i = 0;i<a.size;i++){
                 if (a.get(i)[4].equals(Integer.toString(maxValue))){
                     this.numberOfMaxiumValues+=1;
-                    System.out.println(Arrays.toString(a.get(i)));
                     repeatArray.add(a.get(i));
                 }
             }
@@ -110,6 +110,7 @@ public class predictor {
                     maxIndex = i;
                 }
             }
+            //same as above
             for (int i = 0;i<l.size();i++){
                 if (l.get(i)[4].equals(Integer.toString(maxValue))){
                     this.numberOfMaxiumValues+=1;
@@ -117,17 +118,13 @@ public class predictor {
                 }
             }
         }
-
        return maxIndex;
     }
 
 
     public void menu() throws Exception {
-
         while(true){
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
             System.out.println("State of birth (two-letter state code):");
             String state = reader.readLine();
             //check state input until valid
@@ -151,7 +148,7 @@ public class predictor {
             //if name is exit, break out from while loop
             if (name.equals("Exit"))
                 break;
-            //if not exit
+            //else
             else{
                 //match state gender and name and put into arraylist or linkedlist
                 read(state, gender, name);
@@ -163,21 +160,25 @@ public class predictor {
                     if (ListType().equals("LinkedList")) {
                         //put in linkedlist
                         String[] temp = l.get(findMAXIndex());
+                        //if there is something in repeat linkedlist
                         if (repeatLinkedList.size()>0&&repeatLinkedList.size()!=1){
+                            //print the range of year
                             System.out.println(repeatLinkedList.get(0)[3] + "," + "born in " +
                                     repeatLinkedList.get(0)[0] +
                                     " is most likely around " +
                                     (2021 - Integer.parseInt(repeatLinkedList.get(0)[2])) + " to "+
                                     (2021- Integer.parseInt(repeatLinkedList.get(numberOfMaxiumValues-1)[2]))
                                     +" years old.");
+                            //reset
                             this.l = new LinkedList<>();
                             this.repeatLinkedList = new LinkedList<>();
                             this.numberOfMaxiumValues = 0;
                         }
                         else{
-                        //reset
+                        //if not a ranged return
                         System.out.println(temp[3] + "," + "born in " + temp[0] + " is most likely around " +
                                 (2021 - Integer.parseInt(temp[2])) + " years old.");
+                        //reset everything
                             this.l = new LinkedList<>();
                             this.repeatLinkedList = new LinkedList<>();
                             this.numberOfMaxiumValues = 0;}
@@ -208,12 +209,9 @@ public class predictor {
             }
         }
 
-
-
     }
     public static void main(String[] args) throws Exception {
         predictor d = new predictor();
         d.menu();
-
     }
 }
