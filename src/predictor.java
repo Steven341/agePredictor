@@ -11,8 +11,8 @@ public class predictor {
             "WY"};
     ArrayList<String[]> a = new ArrayList<>();//ArrayList
     LinkedList<String[]> l = new LinkedList<>();//LinkedList
-    ArrayList<String[]> popularNameArray = new ArrayList<>();
-    LinkedList<String[]> popularNameLinkedList = new LinkedList<>();
+    ArrayList<String[]> repeatArray = new ArrayList<>();
+    LinkedList<String[]> repeatLinkedList = new LinkedList<>();
     int numberOfMaxiumValues = 0;
     //helpers
     //return ListType value in property file
@@ -73,7 +73,7 @@ public class predictor {
     //if gender and name matches with input value, put it into LinkedList
     private void writeToLinkedList(String State,String Gender,String Name) throws Exception {
         File myObj = new File(Directory()+State+".TXT");
-        System.out.println(Directory()+State+".TXT");
+        //System.out.println(Directory()+State+".TXT");
         Scanner myReader = new Scanner(myObj);
         while (myReader.hasNextLine()) {
             String data = myReader.nextLine();
@@ -91,12 +91,14 @@ public class predictor {
             for (int i = 0;i<a.size-1;i++){
                 if (Integer.parseInt(a.get(i)[4])>maxValue){
                     maxValue = Integer.parseInt(a.get(i)[4]);
-                    popularNameArray.add(a.get(i));
                     maxIndex = i;
                 }
-                else if (Integer.parseInt(a.get(i)[4])== maxValue) {
-                   this.numberOfMaxiumValues+=1;
-                    popularNameArray.add(a.get(i));
+            }
+            for (int i = 0;i<a.size;i++){
+                if (a.get(i)[4].equals(Integer.toString(maxValue))){
+                    this.numberOfMaxiumValues+=1;
+                    System.out.println(Arrays.toString(a.get(i)));
+                    repeatArray.add(a.get(i));
                 }
             }
 
@@ -108,14 +110,15 @@ public class predictor {
                     maxIndex = i;
                 }
             }
-            for (int i = 0;i<l.size()-1;i++){
-                if (Integer.parseInt(l.get(i)[4])==maxValue&&i!=maxIndex)
-                    popularNameLinkedList.add(l.get(i));
+            for (int i = 0;i<l.size();i++){
+                if (l.get(i)[4].equals(Integer.toString(maxValue))){
+                    this.numberOfMaxiumValues+=1;
+                    repeatLinkedList.add(l.get(i));
+                }
             }
         }
 
-        //return the index of max value
-        return maxIndex;
+       return maxIndex;
     }
 
 
@@ -158,37 +161,48 @@ public class predictor {
                 else {
                     //if there is valid match
                     if (ListType().equals("LinkedList")) {
-                        if (numberOfMaxiumValues>0){
-                            System.out.println(popularNameLinkedList.get(0)[3] + "," + "born in " +
-                                    popularNameLinkedList.get(0)[0] +
-                                    " is most likely around " +
-                                    (2021 - Integer.parseInt(popularNameLinkedList.get(0)[2])) + " to"+
-                                    (2021-Integer.parseInt(popularNameLinkedList.get(numberOfMaxiumValues-1)[2]))
-                                    +" years old.");
-                        }
                         //put in linkedlist
                         String[] temp = l.get(findMAXIndex());
-
+                        if (repeatLinkedList.size()>0&&repeatLinkedList.size()!=1){
+                            System.out.println(repeatLinkedList.get(0)[3] + "," + "born in " +
+                                    repeatLinkedList.get(0)[0] +
+                                    " is most likely around " +
+                                    (2021 - Integer.parseInt(repeatLinkedList.get(0)[2])) + " to "+
+                                    (2021- Integer.parseInt(repeatLinkedList.get(numberOfMaxiumValues-1)[2]))
+                                    +" years old.");
+                            this.l = new LinkedList<>();
+                            this.repeatLinkedList = new LinkedList<>();
+                            this.numberOfMaxiumValues = 0;
+                        }
+                        else{
                         //reset
-                        this.l = new LinkedList<>();
                         System.out.println(temp[3] + "," + "born in " + temp[0] + " is most likely around " +
                                 (2021 - Integer.parseInt(temp[2])) + " years old.");
-                    } else if (ListType().equals("ArrayList")) {
-
-                        if (numberOfMaxiumValues>0){
-                            System.out.println(popularNameArray.get(0)[3] + "," + "born in " +
-                                    popularNameArray.get(0)[0] +
-                                    " is most likely around " +
-                                    (2021 - Integer.parseInt(popularNameArray.get(0)[2])) + " to"+
-                                    (2021- Integer.parseInt(popularNameArray.get(numberOfMaxiumValues-1)[2]))
-                                    +" years old.");
-                        }
+                            this.l = new LinkedList<>();
+                            this.repeatLinkedList = new LinkedList<>();
+                            this.numberOfMaxiumValues = 0;}
+                    }
+                    else if (ListType().equals("ArrayList")) {
                         //put in arraylist
                         String[] temp = a.get(findMAXIndex());
                         //reset
-                        this.a = new ArrayList<>();
+                        if (repeatArray.size>0&&repeatArray.size!=1){
+                            System.out.println(repeatArray.get(0)[3] + "," + "born in " +
+                                    repeatArray.get(0)[0] +
+                                    " is most likely around " +
+                                    (2021 - Integer.parseInt(repeatArray.get(0)[2])) + " to "+
+                                    (2021- Integer.parseInt(repeatArray.get(numberOfMaxiumValues-1)[2]))
+                                    +" years old.");
+                            this.a = new ArrayList<>();
+                            this.repeatArray = new ArrayList<>();
+                            this.numberOfMaxiumValues = 0;
+                        }
+                        else{
                         System.out.println(temp[3] + "," + "born in " + temp[0] + " is most likely around " +
                                     (2021 - Integer.parseInt(temp[2])) + " years old.");
+                            this.a = new ArrayList<>();
+                            this.repeatArray = new ArrayList<>();
+                            this.numberOfMaxiumValues = 0;}
                     }
                 }
             }
